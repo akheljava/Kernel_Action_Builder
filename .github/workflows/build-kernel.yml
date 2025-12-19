@@ -7,7 +7,7 @@ on:
         description: 'Kernel Branch'
         required: true
         type: string
-        default: 'upstream'
+        default: 'main'
       
       enable_ksu:
         description: 'Enable KernelSU'
@@ -245,25 +245,25 @@ jobs:
           # Build zip name based on variant and SUSFS status
           if [ "${{ github.event.inputs.enable_ksu }}" == "true" ]; then
             if [ "$SUSFS_ENABLED" == "true" ]; then
-              ZIP_NAME="Miku-RM6785-${KSU_VARIANT}-SUSFS-${TIMESTAMP}.zip"
+              ZIP_NAME="Miku-RM6785-${KSU_VARIANT}-SUSFS-${TIMESTAMP}"
             else
-              ZIP_NAME="Miku-RM6785-${KSU_VARIANT}-${TIMESTAMP}.zip"
+              ZIP_NAME="Miku-RM6785-${KSU_VARIANT}-${TIMESTAMP}"
             fi
           else
-            ZIP_NAME="Miku-RM6785-Stock-${TIMESTAMP}.zip"
+            ZIP_NAME="Miku-RM6785-Stock-${TIMESTAMP}"
           fi
           
-          zip -r9 "$ZIP_NAME" * > /dev/null 2>&1
+          zip -r9 "${ZIP_NAME}.zip" * > /dev/null 2>&1
           
           echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
-          echo "KERNEL_ZIP=$(pwd)/$ZIP_NAME" >> $GITHUB_ENV
-          echo "✅ Kernel packaged: $ZIP_NAME"
+          echo "ANYKERNEL_DIR=$(pwd)" >> $GITHUB_ENV
+          echo "✅ Kernel packaged: ${ZIP_NAME}.zip"
 
       - name: Upload Kernel Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ZIP_NAME }}
-          path: ${{ env.KERNEL_ZIP }}
+          path: ${{ env.ANYKERNEL_DIR }}/${{ env.ZIP_NAME }}.zip
           retention-days: 30
 
       - name: Get KSU Version Info
